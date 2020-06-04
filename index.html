@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<script src="vue.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<!-- 	绑定text -->
+	<div id="app">
+		{{message}} {{name}}
+	</div>
+
+	<script type="text/javascript">
+		var app = new Vue ({
+			el: "#app",
+			data: {
+				message: "Hello Vue!",
+				name: "aaa"
+			}
+		})
+	</script>
+
+<!-- 	绑定attribute
+    v-bind:title  鼠标移上的显示
+    v-bind:src  绑定图片路径
+    v-bind:html 绑定HTML文本和标签
+    v-bind:text 绑定文本
+    v-bind:class 绑定类样式
+	v-bind:style  动态绑定样式 -->
+	<div id="app-2">
+  		<span v-bind:title="message">
+  		  鼠标悬停几秒钟查看此处动态绑定的提示信息！
+ 		</span>
+	</div>
+
+	<script type="text/javascript">
+		var app2 = new Vue({
+ 			el: '#app-2',
+  			data: {
+    			message: '页面加载于 ' + new Date().toLocaleString()
+  			}
+		})
+	</script>
+
+	<!-- 创建vue实例 -->
+	<div id="example">
+		{{a}} <!-- {{b}} -->
+	</div>
+
+	<script type="text/javascript">
+		var data = {a:1};  // b需要在new Vue之前申明
+		var vm = new Vue({
+			el: "#example",
+			data: data
+		})
+		
+		vm.$watch('a',function(newVal,oldVal){    //watch 需在变量之前
+			console.log(newVal, oldVal);  //test...  1 
+		})    
+
+		vm.$data.a = "test..."
+	</script>
+
+	<!-- vue生命周期 -->
+	<!-- 	beforeCreate
+			created
+			beforeMount
+			Mounted
+			BeforeUpdate
+			Updated 	-->
+	<div id="app3">
+		{{msg}}
+	</div>
+
+	<script type="text/javascript">
+		var vm2 = new Vue({
+			el: "#app3",
+			data: {
+				msg: "hi Vue",
+			},
+			//在实例初始化之后数据观测data observer 和 event/watche 事件配置之前被调用
+			beforeCreate: function(){
+				console.log("beforeCreate");
+			},
+			//在实例创建后被立即调用
+			//在这一步实例已经完成以下的配置：数据观测data observer，属性和fangfa的运算。watch/event事件回调。
+			//然而挂载阶段还没开始，$el 属性不可见。
+			created: function() {
+				console.log("created");
+			},
+			//在挂载开始前被调用，祥光的渲染函数首次被调用
+			beforeMount: function() {
+				console.log("beforeMount");
+			},
+			//el 被创建的vm.$el 替换挂载成功
+			Mounted: function() {
+				console.log("Mounted");
+			},
+			//数据更新时调用
+			BeforeUpdate: function() {
+				console.log("BeforeUpdate");
+			},
+			//组件 DOM已更新，组件更新完毕
+			Updated: function() {
+				console.log("Updated");
+			}
+		});
+
+		setTimeout(function(){
+			vm2.msg = "changing...";
+		},3000);
+
+		//others: activated, deactivated 组件激活/停用时调用 
+		//         beforeDestroy, destroyed 界面销毁时调用
+		//         errorCaptured 捕获子组件的错误时调用
+
+	</script>		
+
+
+	<!-- 语法 -->
+	<!-- 1. v-once -->
+	<!-- 2. v-html -->
+	<!-- 3. v-bind:id/class/......  -->
+	<!-- 4. {{}}内运算 -->
+	<div id="app4" v-once>  <!--  v-once 插入值只会被修改一次 -->
+		{{message}} 
+		<p>Using mustaches： {{rawHTML}}</p> <!-- 只会输出文本 -->
+		<p>Using v-html directive: <span v-html="rawHTML"></span></p>
+		<p v-html="rawHTML"></p>
+		<div v-bind:class="color">teee</div>
+		<p>{{ number + 1 }}</p>
+		<p>{{ ok ? "yes" : "no" }}</p>
+		<p>{{ msg.split('').reverse().join('') }}</p>
+	</div>
+
+	<script type="text/javascript">
+		var vm3 = new Vue ({
+			el: "#app4",
+			data: {
+				message: "Hello Vue!",
+				rawHTML: '<span style="color:red"> this should be red </span>',
+				color: 'blue',
+				number: 10,
+				ok: 1==1, //boolean 
+				msg: "vue",
+			}
+		})
+		vm3.message = "hi.....";   // message 不会被再次修改
+		vm3.color= 'blue';
+	</script>
+	<style type="text/css">
+		.red{color: red;}
+		.blue{color: blue;font-size: 100px;}
+	</style>
+
+	<!-- 指令 -->
+	<!-- 1. v-if -->
+	<!-- 2. v:bind:href -->
+	<!-- 3. @click -->
+	<div id="app5">
+		<p v-if="seen"> 现在你看到了我 </p>
+		<a v-bind:href="url">...</a>
+		<div @click="click1">
+			<div @click.stop="click2">  <!-- 有.stop时只执行子级事件然后停止 -->
+				click me
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var vm = new Vue ({
+			el: "#app5",
+			data: {
+				seen: true,
+				url: "test.html"
+			},
+			methods:{
+				click1: function(){
+					console.log("click1");
+				},
+				click2:function(){
+					console.log("click2");
+				}
+			}
+		})
+	</script>
+
+	<div id="app6"> 
+		<!-- v-bind:class= "['active','green']"  支持数组格式 -->
+		<!-- v-bind:class= "[ isAcitve ？ 'active': '', isGreen ? 'green': '']"  动态绑定支持数组格式 -->
+		<div
+		 class="test"
+		 v-bind:class= "{active:isactive, isGreen}"
+		 style="width: 200px; height: 200px; text-align:center; line-height:200px;">hi vue</div>
+		 <div 
+		  :style="{color: color, fontSize:size, background:isRed? '#FF0000': ''}">
+		  hi vue
+		</div>
+	</div>
+	<script type="text/javascript">
+		var vm4 = new Vue({
+			el: "#app6",
+			data: {
+				isactive: true,
+				isGreen: true,
+				size:'50px',
+				color:"#FFFFFF",
+				isRed: true
+			}
+		})
+	</script>
+	<style type="text/css">
+		.test{font-size: 30px;}
+		.green{color: #00FF00;}
+		.active{background:#FF0000;}
+	</style>
+
+	<!-- v-if  -->
+	<!-- v-else-if -->
+	<!-- v-else -->
+	<!-- v-show -->
+	<div id="app7">
+		<div v-if="type === 'A'">A</div>
+		<div v-else-if="type === 'B'">B</div>
+		<div v-else-if="type === 'C'">C</div>
+		<div v-else>NotA/B/C</div>
+		<h1 v-show="ok">Hello</h1> <!--  display属性none/block 频繁切换推荐-->
+	</div>
+	<script type="text/javascript">
+		var vm = new Vue({
+			el: "#app7",
+			data:{
+				type:"",
+				ok: true 
+			}
+		})
+	</script>
+
+
+	<!-- v-for -->
+	<div id="app8">
+		<ul>
+			<li v-for="item,index in items" :key="index">
+				{{index}}{{item.message}}
+			</li>
+		</ul>
+		<ul>
+			<li v-for="value, key in object" :key="key">
+				{{key}}: {{value}}
+			</li>
+		</ul>
+	</div>
+	<script type="text/javascript">
+		var vm = new Vue ({
+			el: "#app8",
+			data: {
+				items:[
+					{message:"Foo"},
+					{message:"Bar"}
+				],
+				object: {
+					title: "How to do lists in Vue",
+					author: "aa",
+					publishedAt:"2020"
+				}
+			}
+		})
+			
+	</script>
+
+
+	<!-- 事件绑定 -->
+	<div id="app9">
+		<div id="ex1">
+			<button v-on:click="counter+= 1">数值：{{counter}}</button>
+			<button v-on:click="greet('abc', $event)">greet</button>
+			<!-- v-on:dblclick  双击-->
+		</div>
+	</div>	
+	<script type="text/javascript">
+		var vm = new Vue ({
+			el: "#app9",
+			data: {
+				counter: 0,
+				name: "vue"
+			},
+			methods:{
+				greet: function (aaa, e){
+					alert("hi");
+					alert(this.name);
+					alert(aaa);
+					console.log(e);
+				}
+			}
+		});
+	</script>
+
+
+    <!-- 表单输入绑定 -->
+    <div id="app10">
+    	<div id="ex2">
+    		<input type="text" v-model="message" placeholder="edit me"> 
+    		<p>Message is: {{message}}  </p>
+
+    		<textarea v-model="msg" placeholder="add multiple lines"></textarea>
+    		<p style="white-space: pre-line;">{{msg}}</p>
+    		<br>
+
+    		<div style="margin-top: 20px;">
+    			<input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+    			<label for="jack">Jack</label>
+    			<input type="checkbox" id="john" value="John" v-model="checkedNames">
+    			<label for="john">John</label>
+    			<input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+    			<label for="mike">Mike</label>
+    			<br>
+    			<span>Checked names: {{checkedNames}}</span>
+    		</div>
+
+    		<div style="margin-top: 20px;">
+    			<input type="radio" id="one" value="One" v-model="picked">
+    			<label for="one">One</label>
+    			<input type="radio" id="two" value="Two" v-model="picked">
+    			<label for="two">Two</label>
+    			<br>
+				<span>Picked: {{picked}}</span>
+    		</div>
+    		<button type="button" @click="submit">提交</button>
+    	</div>
+    	
+    </div>
+    <script type="text/javascript">
+    	var vm = new Vue ({
+    		el: "#app10",
+    		data: {
+    			message: "",
+    			msg: 'hiddddddddd',
+    			checkedNames:[],
+    			picked:"Two"
+    		},
+    		methods:{
+    			submit: function(){
+    				console.log(this.message);
+    				var postObj = {
+    					msg1 : this.message,
+    					msg2: this.message,
+    					checkval: this.checkedNames
+    				};
+    				console.log(postObj);
+    			}
+    		}
+    	})
+    </script>
+
+</body>
+</html>
